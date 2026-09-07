@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Kingshot_blacklist</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --ink: #1b2230;
+    --ink-2: #5b6474;
+    --line: #dfe3ea;
+    --focus: #2b5bd7;
+    --danger: #b3261e;
+    --lv-enemy: #7a0c1e;
+    --lv-worst: #b3261e;
+    --lv-verybad: #d1592a;
+    --lv-high: #c98a1b;
+    --lv-medium: #6b7280;
+    --lv-low: #9aa3b2;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink);
+    font-size: 15px; line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* 언어 전환 */
+  .topbar { display: flex; justify-content: flex-end; }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--panel); }
+  .lang button {
+    font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    padding: 6px 12px; border: 0; background: transparent; color: var(--ink-2); border-radius: 0;
+  }
+  .lang button[aria-pressed=true] { background: var(--ink); color: #fff; }
+  .lang button:focus-visible { outline: 3px solid rgba(43,91,215,.4); outline-offset: -3px; }
+
+  h1 { font-size: 20px; font-weight: 700; margin: 0 0 24px; letter-spacing: -0.01em; }
+
+  /* 공통 폼 */
+  .row { display: flex; gap: 8px; }
+  input[type=text], input[type=password] {
+    flex: 1; min-width: 0;
+    font: inherit; color: var(--ink);
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--panel); outline: none;
+  }
+  input:focus-visible { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(43,91,215,.18); }
+  .row button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    padding: 12px 18px; border: 0; border-radius: 6px;
+    background: var(--ink); color: #fff;
+  }
+  .row button:disabled { opacity: .5; cursor: default; }
+  .row button:focus-visible { outline: 3px solid rgba(43,91,215,.4); outline-offset: 2px; }
+  .msg { margin-top: 12px; color: var(--ink-2); }
+  .msg.err { color: var(--danger); }
+
+  /* 비밀번호 화면 */
+  #gate { max-width: 420px; margin: 16vh auto 0; }
+  #gate p { color: var(--ink-2); margin: 0 0 16px; }
+
+  /* 검색 화면 */
+  #app { display: none; margin-top: 24px; }
+  #app.on { display: block; }
+  #gate.off { display: none; }
+  .hint { color: var(--ink-2); font-size: 13px; margin: 8px 0 0; }
+
+  /* 결과 */
+  #result { margin-top: 28px; }
+  .count { color: var(--ink-2); margin: 0; }
+  .result-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 10px; }
+  .table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 13px; background: #fafbfc; }
+  tr:last-child td { border-bottom: 0; }
+  td.wrapcell { white-space: normal; min-width: 200px; }
+  td.mono { font-variant-numeric: tabular-nums; }
+  .lv { display: inline-block; padding: 2px 8px; border-radius: 4px; color: #fff; font-size: 13px; font-weight: 600; }
+  .lv-Enemy { background: var(--lv-enemy); }
+  .lv-Worst { background: var(--lv-worst); }
+  .lv-VeryBad { background: var(--lv-verybad); }
+  .lv-High { background: var(--lv-high); }
+  .lv-Medium { background: var(--lv-medium); }
+  .lv-Low { background: var(--lv-low); }
+  .lv-other { background: var(--ink-2); }
+  .legend-btn {
+    font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--panel); color: var(--ink-2);
+  }
+  .legend-btn[aria-expanded=true] { color: var(--ink); border-color: var(--ink-2); }
+  .legend-btn:focus-visible { outline: 3px solid rgba(43,91,215,.4); outline-offset: 2px; }
+  .legend { display: none; margin: 0 0 10px; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .legend.on { display: block; }
+  .legend p { margin: 0 0 8px; color: var(--ink-2); font-size: 13px; }
+  .legend .lvs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .legend .arrow { color: var(--ink-2); font-size: 12px; }
+  .empty { padding: 36px 16px; text-align: center; color: var(--ink-2); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 16px 14px 60px; }
+    #gate { margin-top: 8vh; }
+
+    /* 표 대신 카드형 */
+    .table-wrap { border: 0; background: transparent; overflow: visible; }
+    table { display: block; width: auto; min-width: 0; }
+    thead { display: none; }
+    tbody { display: flex; flex-direction: column; gap: 10px; }
+    tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 10px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+      padding: 14px 16px;
+    }
+    td { padding: 0; border: 0; white-space: normal; align-self: start; }
+    td[data-label]::before {
+      content: attr(data-label);
+      display: block; font-size: 12px; color: var(--ink-2); font-weight: 600; margin-bottom: 2px;
+    }
+    /* 1행: 닉네임+ID (왼쪽 2칸), Bad level (오른쪽 1칸) */
+    td.cell-nickname {
+      grid-column: 1 / 3; grid-row: 1; order: 0;
+      font-size: 17px; font-weight: 700; line-height: 1.3;
+    }
+    td.cell-nickname::before { display: none; }
+    td.cell-id {
+      grid-column: 1 / 3; grid-row: 2; order: 0;
+      font-size: 13px; color: var(--ink-2);
+    }
+    td.cell-bad_level {
+      grid-column: 3; grid-row: 1; order: 0;
+      justify-self: end; text-align: right;
+    }
+    td.cell-bad_level::before { display: none; }
+    /* 2행: 서버 / 연맹 / 랭크 */
+    td.cell-server { grid-column: 1; grid-row: 3; }
+    td.cell-league { grid-column: 2; grid-row: 3; }
+    td.cell-rank   { grid-column: 3; grid-row: 3; justify-self: start; }
+    /* 3행: remark */
+    td.cell-remark {
+      grid-column: 1 / -1; grid-row: 4;
+      margin-top: 2px; padding-top: 10px; border-top: 1px solid var(--line);
+      color: var(--ink-2); font-size: 14px;
+    }
+    td.cell-remark:empty { display: none; }
+    td.cell-remark::before { content: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="true">KO</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <section id="gate">
+    <h1>Kingshot_blacklist</h1>
+    <p data-i18n="gate_desc"></p>
+    <div class="row">
+      <input id="pw" type="password" data-i18n-ph="pw_ph" autocomplete="current-password" autofocus>
+      <button id="pwBtn" data-i18n="enter"></button>
+    </div>
+    <div id="pwMsg" class="msg" aria-live="polite"></div>
+  </section>
+
+  <section id="app">
+    <h1>Kingshot_blacklist</h1>
+    <div class="row">
+      <input id="q" type="text" data-i18n-ph="q_ph" autocomplete="off">
+      <button id="qBtn" data-i18n="search"></button>
+    </div>
+    <p class="hint" data-i18n="hint"></p>
+    <div id="result" aria-live="polite"></div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  const API = "/api/search";
+  let password = ""; // 메모리에만 보관. 새로고침하면 다시 입력.
+  let lang = "ko";
+
+  // ----- 문구 -----
+  const T = {
+    ko: {
+      gate_desc: "비밀번호를 입력하면 조회할 수 있습니다.",
+      pw_ph: "비밀번호",
+      enter: "입장",
+      q_ph: "닉네임 또는 ID",
+      search: "검색",
+      hint: "닉네임·ID의 일부만 입력해도 검색됩니다.",
+      pw_empty: "비밀번호를 입력하세요.",
+      checking: "확인 중…",
+      searching: "검색 중…",
+      q_empty: "검색어를 입력하세요.",
+      q_short: "3자 이상 입력하세요.",
+      no_result: t => `"${t}"에 대한 검색 결과가 없습니다.`,
+      count: n => `${n}건`,
+      pw_changed: "비밀번호가 변경되었습니다. 다시 입력하세요.",
+      legend_btn: "Bad level 안내",
+      legend_desc: "Bad level은 아래 6단계로 구분됩니다. 왼쪽일수록 높은 단계입니다.",
+      err: {
+        bad_password: "비밀번호가 올바르지 않습니다.",
+        empty_query: "검색어를 입력하세요.",
+        short_query: "3자 이상 입력하세요.",
+        sheet_error: "데이터를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+        env_missing: "서버 설정이 완료되지 않았습니다.",
+        bad_request: "잘못된 요청입니다.",
+        network: "서버에 연결할 수 없습니다.",
+        unknown: s => `오류 (${s})`,
+      },
+    },
+    en: {
+      gate_desc: "Enter the password to search.",
+      pw_ph: "Password",
+      enter: "Enter",
+      q_ph: "Nickname or ID",
+      search: "Search",
+      hint: "Partial nickname or ID works too.",
+      pw_empty: "Enter the password.",
+      checking: "Checking…",
+      searching: "Searching…",
+      q_empty: "Enter a search term.",
+      q_short: "Enter at least 3 characters.",
+      no_result: t => `No results for "${t}".`,
+      count: n => `${n} result${n === 1 ? "" : "s"}`,
+      pw_changed: "The password has changed. Enter it again.",
+      legend_btn: "About Bad level",
+      legend_desc: "Bad level has 6 grades, listed below. Further left is more severe.",
+      err: {
+        bad_password: "Incorrect password.",
+        empty_query: "Enter a search term.",
+        short_query: "Enter at least 3 characters.",
+        sheet_error: "Could not load data. Try again shortly.",
+        env_missing: "Server is not configured yet.",
+        bad_request: "Invalid request.",
+        network: "Cannot reach the server.",
+        unknown: s => `Error (${s})`,
+      },
+    },
+  };
+  const t = k => T[lang][k];
+
+  const $ = id => document.getElementById(id);
+  const gate = $("gate"), app = $("app");
+  const pw = $("pw"), pwBtn = $("pwBtn"), pwMsg = $("pwMsg");
+  const q = $("q"), qBtn = $("qBtn"), result = $("result");
+
+  // 결과 표 컬럼 (언어 전환 대상 아님)
+  const COLS = [
+    ["server", "server"],
+    ["league", "league"],
+    ["rank", "rank"],
+    ["id", "ID"],
+    ["nickname", "nickname"],
+    ["bad_level", "Bad level"],
+    ["remark", "remark"],
+  ];
+
+  // 마지막 상태(언어 전환 시 다시 그리기용)
+  let last = { pwMsg: null, result: null }; // {key, arg, err}
+  let legendOpen = false;
+  const LEVELS = ["Enemy", "Worst", "Very Bad", "High", "Medium", "Low"];
+
+  function legendHtml() {
+    const chips = LEVELS.map(l => `<span class="lv ${lvClass(l)}">${esc(l)}</span>`)
+      .join(`<span class="arrow">&gt;</span>`);
+    return {
+      btn: `<button type="button" class="legend-btn" id="legendBtn" aria-expanded="${legendOpen}" aria-controls="legend">${esc(t("legend_btn"))}</button>`,
+      panel: `<div class="legend${legendOpen ? " on" : ""}" id="legend"><p>${esc(t("legend_desc"))}</p><div class="lvs">${chips}</div></div>`,
+    };
+  }
+  function bindLegend() {
+    const b = document.getElementById("legendBtn"), l = document.getElementById("legend");
+    if (!b) return;
+    b.addEventListener("click", () => {
+      legendOpen = !legendOpen;
+      b.setAttribute("aria-expanded", String(legendOpen));
+      l.classList.toggle("on", legendOpen);
+    });
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang button").forEach(b =>
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    if (last.pwMsg) setPwMsg(last.pwMsg.key, last.pwMsg.err);
+    if (last.result) showResult(last.result);
+  }
+  document.querySelectorAll(".lang button").forEach(b =>
+    b.addEventListener("click", () => { lang = b.dataset.lang; applyLang(); }));
+
+  function setPwMsg(key, err) {
+    last.pwMsg = key ? { key, err } : null;
+    pwMsg.textContent = key ? (typeof key === "string" && T[lang][key] ? t(key) : errText(key)) : "";
+    pwMsg.className = "msg" + (err ? " err" : "");
+  }
+  function errText(e) {
+    const E = T[lang].err;
+    if (e && e.code && E[e.code]) return E[e.code];
+    if (e && e.status) return E.unknown(e.status);
+    return E.network;
+  }
+
+  async function call(payload) {
+    let res;
+    try {
+      res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch { throw { code: "network" }; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw { code: data.code, status: res.status };
+    return data;
+  }
+
+  function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+  function lvClass(v) {
+    const k = String(v || "").replace(/\s+/g, "");
+    return ["Enemy","Worst","VeryBad","High","Medium","Low"].includes(k) ? "lv-" + k : "lv-other";
+  }
+
+  // ----- 비밀번호 -----
+  async function login() {
+    const v = pw.value;
+    if (!v) { setPwMsg("pw_empty", true); return; }
+    pwBtn.disabled = true; setPwMsg("checking", false);
+    try {
+      await call({ action: "auth", password: v });
+      password = v;
+      setPwMsg(null);
+      gate.classList.add("off"); app.classList.add("on");
+      q.focus();
+    } catch (e) {
+      setPwMsg(e, true);
+    } finally { pwBtn.disabled = false; }
+  }
+  pwBtn.addEventListener("click", login);
+  pw.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+  // ----- 검색 -----
+  async function search() {
+    const term = q.value.trim();
+    if (!term) { showResult({ type: "empty", key: "q_empty" }); return; }
+    if (term.length < 3) { showResult({ type: "empty", key: "q_short" }); return; }
+    qBtn.disabled = true; showResult({ type: "count", key: "searching" });
+    try {
+      const data = await call({ action: "search", password, q: term });
+      showResult({ type: "rows", term, rows: data.results || [] });
+    } catch (e) {
+      if (e && e.code === "bad_password") {
+        password = ""; app.classList.remove("on"); gate.classList.remove("off");
+        showResult(null);
+        setPwMsg("pw_changed", true);
+        pw.value = ""; pw.focus();
+      } else {
+        showResult({ type: "empty", err: e });
+      }
+    } finally { qBtn.disabled = false; }
+  }
+
+  function showResult(state) {
+    last.result = state;
+    if (!state) { result.innerHTML = ""; return; }
+    if (state.type === "empty") {
+      result.innerHTML = `<div class="empty">${esc(state.key ? t(state.key) : errText(state.err))}</div>`;
+      return;
+    }
+    if (state.type === "count") {
+      result.innerHTML = `<p class="count">${esc(t(state.key))}</p>`;
+      return;
+    }
+    const { term, rows } = state;
+    if (!rows.length) {
+      result.innerHTML = `<div class="empty">${esc(t("no_result")(term))}</div>`;
+      return;
+    }
+    const head = COLS.map(([, label]) => `<th>${esc(label)}</th>`).join("");
+    const body = rows.map(r => "<tr>" + COLS.map(([k, label]) => {
+      const v = r[k];
+      const dl = ` data-label="${esc(label)}"`;
+      if (k === "bad_level") return `<td class="cell-${k}"${dl}><span class="lv ${lvClass(v)}">${esc(v)}</span></td>`;
+      if (k === "remark") return `<td class="cell-${k} wrapcell"${dl}>${esc(v)}</td>`;
+      if (k === "id" || k === "server") return `<td class="cell-${k} mono"${dl}>${esc(v)}</td>`;
+      return `<td class="cell-${k}"${dl}>${esc(v)}</td>`;
+    }).join("") + "</tr>").join("");
+    const lg = legendHtml();
+    result.innerHTML =
+      `<div class="result-head"><p class="count">${esc(t("count")(rows.length))}</p>${lg.btn}</div>` +
+      lg.panel +
+      `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    bindLegend();
+  }
+  qBtn.addEventListener("click", search);
+  q.addEventListener("keydown", e => { if (e.key === "Enter") search(); });
+
+  applyLang();
+})();
+</script>
+</body>
+</html>
