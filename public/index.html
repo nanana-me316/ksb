@@ -216,7 +216,7 @@
       err: {
         bad_password: "비밀번호가 올바르지 않습니다.",
         empty_query: "검색어를 입력하세요.",
-        short_query: "3자 이상 입력하세요.",
+        short_query: "2자 이상 입력하세요.",
         sheet_error: "데이터를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
         env_missing: "서버 설정이 완료되지 않았습니다.",
         bad_request: "잘못된 요청입니다.",
@@ -244,7 +244,7 @@
       err: {
         bad_password: "Incorrect password.",
         empty_query: "Enter a search term.",
-        short_query: "Enter at least 3 characters.",
+        short_query: "Enter at least 2 characters.",
         sheet_error: "Could not load data. Try again shortly.",
         env_missing: "Server is not configured yet.",
         bad_request: "Invalid request.",
@@ -362,7 +362,7 @@
   async function search() {
     const term = q.value.trim();
     if (!term) { showResult({ type: "empty", key: "q_empty" }); return; }
-    if (term.length < 3) { showResult({ type: "empty", key: "q_short" }); return; }
+    if (term.length < 2) { showResult({ type: "empty", key: "q_short" }); return; }
     qBtn.disabled = true; showResult({ type: "count", key: "searching" });
     try {
       const data = await call({ action: "search", password, q: term });
