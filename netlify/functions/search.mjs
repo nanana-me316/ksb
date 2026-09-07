@@ -114,7 +114,7 @@ export default async (req) => {
   if (action === "search") {
     const term = String(q ?? "").trim().toLowerCase();
     if (!term) return json(400, { code: "empty_query", error: "검색어를 입력하세요." });
-    if (term.length < 3) return json(400, { code: "short_query", error: "3자 이상 입력하세요." });
+    if (term.length < 2) return json(400, { code: "short_query", error: "2자 이상 입력하세요." });
 
     let rows;
     try { rows = await loadRows(sheetId); }
